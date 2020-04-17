@@ -28,7 +28,6 @@ if [ -n "$MYSQL_PORT_3306_TCP" ]; then
 fi
 
 
-
 if [ -z "$MAUTIC_DB_HOST" ]; then
         echo >&2 "error: missing MAUTIC_DB_HOST and MYSQL_PORT_3306_TCP environment variables"
         echo >&2 "  Did you forget to --link some_mysql_container:mysql or set an external db"
@@ -134,6 +133,7 @@ else
     echo >&2 "Not running cron as requested."
 fi
 
+
 echo >&2
 echo >&2 "========================================================================"
 
@@ -147,6 +147,7 @@ fi
 
 "$@" &
 MAINPID=$!
+
 
 shut_down() {
     if [[ "$MAUTIC_RUN_CRON_JOBS" == "true" ]]; then
