@@ -1,6 +1,7 @@
 FROM php:7.3-apache
 
 LABEL vendor="Mautic"
+
 LABEL maintainer="Luiz Eduardo Oliveira Fonseca <luiz@powertic.com>"
 
 # Install PHP extensions
@@ -15,6 +16,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libmcrypt-dev \
     libssl-dev \
     libz-dev \
+    libzip-dev \
     unzip \
     zip \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
@@ -39,8 +41,10 @@ ENV MAUTIC_SHA1 65580526c72cdf8f65e6239378cce8d4b06a3667
 # By default enable cron jobs
 ENV MAUTIC_RUN_CRON_JOBS true
 
-# Setting an root user for test
+# Setting an Default database user for Mysql
 ENV MAUTIC_DB_USER root
+
+# Setting an Default database name for Mysql
 ENV MAUTIC_DB_NAME mautic
 
 # Setting PHP properties
