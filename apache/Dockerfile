@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     wget \
     dos2unix \
     sudo \
+    libkrb5-dev \
     libc-client-dev \
     libicu-dev \
     libkrb5-dev \
@@ -37,12 +38,15 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && rm -rf /var/lib/apt/lists/* \
     && rm /etc/cron.daily/*
 
-RUN docker-php-ext-configure imap --with-imap --with-imap-ssl --with-kerberos \
-    && docker-php-ext-configure gd --with-freetype-dir=/usr/lib --with-png-dir=/usr/lib --with-jpeg-dir=/usr/lib \
+RUN docker-php-ext-configure imap --with-kerberos --with-imap-ssl && \
+    docker-php-ext-install imap && \
+    docker-php-ext-enable imap 
+ 
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/lib --with-png-dir=/usr/lib --with-jpeg-dir=/usr/lib \
     && docker-php-ext-install gd \
     && docker-php-ext-configure opcache --enable-opcache \
-    && docker-php-ext-install imap intl mbstring mysqli pdo_mysql zip opcache bcmath gd \
-    && docker-php-ext-enable imap intl mbstring mysqli pdo_mysql zip opcache bcmath gd
+    && docker-php-ext-install intl mbstring mysqli pdo_mysql zip opcache bcmath gd \
+    && docker-php-ext-enable intl mbstring mysqli pdo_mysql zip opcache bcmath gd
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
