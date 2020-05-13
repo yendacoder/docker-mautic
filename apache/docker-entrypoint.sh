@@ -2,7 +2,7 @@
 set -e
 
 if [ ! -f /usr/local/etc/php/php.ini ]; then
-	cat <<EOF > /usr/local/etc/php/php.ini
+cat <<EOF > /usr/local/etc/php/php.ini
 date.timezone = "${PHP_INI_DATE_TIMEZONE}"
 always_populate_raw_post_data = -1
 memory_limit = ${PHP_MEMORY_LIMIT}
@@ -134,21 +134,11 @@ else
     echo >&2 "Not running cron as requested."
 fi
 
-
 echo >&2
 echo >&2 "========================================================================"
 
-
-# Github Pull Tester
-if [ -n "$MAUTIC_TESTER" ]; then
-  echo >&2 "Copying Mautic Github Pull Tester"
-  wget https://raw.githubusercontent.com/mautic/mautic-tester/master/tester.php
-fi
-
-
 "$@" &
 MAINPID=$!
-
 
 shut_down() {
     if [[ "$MAUTIC_RUN_CRON_JOBS" == "true" ]]; then
