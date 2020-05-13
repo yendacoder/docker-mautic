@@ -6,9 +6,13 @@ LABEL maintainer="Luiz Eduardo Oliveira Fonseca <luiz@powertic.com>"
 
 # Install PHP extensions
 RUN apt-get update && apt-get install --no-install-recommends -y \
+    ca-certificates \
+    build-essential  \
+    software-properties-common \
     cron \
     git \
     wget \
+    dos2unix \
     sudo \
     libc-client-dev \
     libicu-dev \
@@ -17,19 +21,25 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     libssl-dev \
     libz-dev \
     libzip-dev \
-    libmagick++-dev \
     libmagickwand-dev \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
+    imagemagick \
     libpng-dev \
+    libwebp-dev \
+    libjpeg62-turbo-dev \
+    libxpm-dev \
+    libjpeg-dev \
+    libfreetype6-dev \
     unzip \
+    nano \
     zip \
+    mariadb-client \
     && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
     && rm -rf /var/lib/apt/lists/* \
     && rm /etc/cron.daily/*
 
 RUN docker-php-ext-configure imap --with-imap --with-imap-ssl --with-kerberos \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/lib --with-png-dir=/usr/lib --with-jpeg-dir=/usr/lib \
+    && docker-php-ext-install gd \
     && docker-php-ext-configure opcache --enable-opcache \
     && docker-php-ext-install imap intl mbstring mysqli pdo_mysql zip opcache bcmath gd \
     && docker-php-ext-enable imap intl mbstring mysqli pdo_mysql zip opcache bcmath gd
