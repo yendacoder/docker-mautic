@@ -10,24 +10,35 @@ Mautic is distributed under the GPL v3 license. Full details of the license can 
 
 You can access and customize Docker Mautic from [Official Docker Hub image](https://hub.docker.com/r/mautic/mautic/).
 
-# Pulling image from Docker Hub
+# Pulling Mautic images from Docker Hub
 
-If you want to pull the latest stable image from DockerHub:
+If you want to pull the latest **development** image from Mautic 3 Series on DockerHub:
 
     docker pull mautic/mautic:latest
 
-**You can use the beta images to test latest beta releases of Mautic with current PHP version.**
+If you want to pull the latest **stable** image from Mautic 3 Series on DockerHub:
+
+    docker pull mautic/mautic:v3
+
+If you want to pull the latest **stable** image from Mautic 2 Series on DockerHub:
+
+    docker pull mautic/mautic:v2
 
 # Running Basic Container
+
+Setting up a NetWork
+
+    $ docker network create mauticnet
 
 Setting up MySQL Server:
 
     $ docker volume create mysql_data
 
-    $ docker run --name percona -d \
+    $ docker run --name database -d \
         -p 3306:3306 \
         -e MYSQL_ROOT_PASSWORD=mypassword \
         -v mysql_data:/var/lib/mysql \
+        --net=mauticnet \
         percona/percona-server:5.7 \
          --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
 
@@ -37,17 +48,17 @@ Running Mautic:
 
     $ docker run --name mautic -d \
         --restart=always \
-        -e MAUTIC_DB_HOST=127.0.0.1 \
+        -e MAUTIC_DB_HOST=database \
         -e MAUTIC_DB_USER=root \
         -e MAUTIC_DB_PASSWORD=mypassword \
         -e MAUTIC_DB_NAME=mautic \
         -e MAUTIC_RUN_CRON_JOBS=true \
-        -e MAUTIC_TRUSTED_PROXIES=0.0.0.0/0 \
         -p 8080:80 \
+        --net=mauticnet \
         -v mautic_data:/var/www/html \
-        mautic/mautic:latest
+        mautic/mautic:v3
 
-This will run a basic mysql service within Mautic on http://localhost:8080.
+This will run a basic Mautic on http://localhost:8080.
 
 ## Customizing Mautic Container
 
@@ -99,13 +110,18 @@ On first run Mautic is unpacked at `/var/www/html`. You need to attach a volume 
 
 Mautic Docker has two ENV that you can specify an version do start your new container:
 
- - `-e MAUTIC_VERSION` (Defaults to "2.15.0")
- - `-e MAUTIC_SHA1` (Defalts to "b07bd42bb092cc96785d2541b33700b55f74ece7")
+ - `-e MAUTIC_VERSION` (Defaults to "3.0.0")
+ - `-e MAUTIC_SHA1` (Defalts to "ed4287367b8484aa146a1fa904b261ab30d9c6e7")
 
 ## Accesing the Instance
 
 Access your new Mautic on `http://localhost:8080` or `http://host-ip:8080` in a browser.
 
+## Add SSL to your Mautic
+
+If Mautic behind a reverse proxy you can set a list of comma-separated CIDR network addresses it sets those addresses as trusted proxies. 
+
+If you change the Site Address of Mautic General Settings to HTTPS (behind a reverse proxy), you can use `0.0.0.0/0` as Trusted Proxies to avoid a redirect loop error. See [documentation](http://symfony.com/doc/current/request/load_balancer_reverse_proxy.html)
 
 ## ... via [`docker-compose`](https://github.com/docker/compose)
 
@@ -116,47 +132,36 @@ version: '2'
 
 services:
 
-  mauticdb:
-    image: percona/percona-server:5.7
-    container_name: mauticdb
-    volumes:
-      - mysql_data:/var/lib/mysql
-    environment:
-      - MYSQL_ROOT_PASSWORD=mysecret
-    command:
-      --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci
-    networks:
-      - mautic-net
-
-  mautic:
-    image: mautic/mautic:latest
-    container_name: mautic
-    links:
-      - mauticdb:mysql
-    depends_on:
-      - mauticdb
-    ports:
-      - 8080:80
-    volumes:
-      - mautic_data:/var/www/html
-    environment:
-      - MAUTIC_DB_HOST=mauticdb
-      - MYSQL_PORT_3306_TCP=3306
+ database:
+   image: powertic/percona-docker
+   container_name: database
+   environment:
+    MYSQL_ROOT_PASSWORD: mypassword
+   ports:
+    - "3306:3306"
+   volumes:
+    - database:/var/lib/mysql
+   restart: always
+   networks:
+    - mauticnet
+   command:
+    --character-set-server=utf8mb4 --collation-server=utf8mb4_general_ci --sql-mode=""
+    
+ mautic:
+   container_name: mautic
+   image: mautic/mautic:v3
+   volumes:
+   - mautic_data:/var/www/html
+   environment:
+      - MAUTIC_DB_HOST=database
       - MAUTIC_DB_USER=root
-      - MAUTIC_DB_PASSWORD=mysecret
-      - MAUTIC_DB_NAME=mautic
-      - MAUTIC_RUN_CRON_JOBS=true
-    networks:
-      - mautic-net
-
-volumes:
-  mysql_data:
-    driver: local
-  mautic_data:
-    driver: local
-networks:
-  mautic-net:
-    driver: bridge
+      - MAUTIC_DB_PASSWORD=mypassword
+      - MAUTIC_DB_NAME=mautic3
+   restart: always
+   networks:
+    - mauticnet
+   ports:
+      - "8880:80"
 ```
 
 Run `docker-compose up`, wait for it to initialize completely, and visit `http://localhost:8080` or `http://host-ip:8080`.
