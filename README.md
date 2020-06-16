@@ -6,7 +6,7 @@ Docker Mautic Image
 
 Mautic is distributed under the GPL v3 license. Full details of the license can be found in the [Mautic GitHub repository](https://github.com/mautic/mautic/blob/staging/LICENSE.txt).
 
-# How to use this image
+# How to use Docker-Mautic
 
 You can access and customize Docker Mautic from [Official Docker Hub image](https://hub.docker.com/r/mautic/mautic/).
 
@@ -26,7 +26,7 @@ If you want to pull the latest **stable** image from Mautic 2 Series on DockerHu
 
 # Running Basic Container
 
-Setting up a NetWork
+Setting up a Network:
 
     $ docker network create mauticnet
 
@@ -35,6 +35,7 @@ Setting up MySQL Server:
     $ docker volume create mysql_data
 
     $ docker run --name database -d \
+        --restart=always \
         -p 3306:3306 \
         -e MYSQL_ROOT_PASSWORD=mypassword \
         -v mysql_data:/var/lib/mysql \
