@@ -120,9 +120,7 @@ Access your new Mautic on `http://localhost:8080` or `http://host-ip:8080` in a 
 
 ## Add SSL to your Mautic
 
-If Mautic behind a reverse proxy you can set a list of comma-separated CIDR network addresses it sets those addresses as trusted proxies. 
-
-If you change the Site Address of Mautic General Settings to HTTPS (behind a reverse proxy), you can use `0.0.0.0/0` as Trusted Proxies to avoid a redirect loop error. See [documentation](http://symfony.com/doc/current/request/load_balancer_reverse_proxy.html)
+If you change the *Site Address* of *Mautic General Settings tab* to HTTPS (behind a reverse proxy), you can use `0.0.0.0/0` as Trusted Proxies to avoid a redirect loop error. See [documentation](http://symfony.com/doc/current/request/load_balancer_reverse_proxy.html)
 
 ## ... via [`docker-compose`](https://github.com/docker/compose)
 
