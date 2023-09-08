@@ -14,6 +14,19 @@ max_execution_time = ${PHP_MAX_EXECUTION_TIME}
 EOF
 fi
 
+if [ -n "$MAUTIC_DB_PASSWORD_FILE" ]; then
+	export MAUTIC_DB_PASSWORD=$(cat "$MAUTIC_DB_PASSWORD_FILE" | tr -d "[:space:]")
+fi
+if [ -n "$MAUTIC_DB_USER_FILE" ]; then
+	export MAUTIC_DB_USER=$(cat "$MAUTIC_DB_USER_FILE" | tr -d "[:space:]")
+fi
+if [ -n "$MAUTIC_DB_HOST_FILE" ]; then
+	export MAUTIC_DB_HOST=$(cat "$MAUTIC_DB_HOST_FILE" | tr -d "[:space:]")
+fi
+if [ -n "$MAUTIC_DB_NAME_FILE" ]; then
+	export MAUTIC_DB_NAME=$(cat "$MAUTIC_DB_NAME_FILE" | tr -d "[:space:]")
+fi
+
 if [ -n "$MYSQL_PORT_3306_TCP" ]; then
         if [ -z "$MAUTIC_DB_HOST" ]; then
                 export MAUTIC_DB_HOST='mysql'
@@ -103,11 +116,6 @@ php /makedb.php "$MAUTIC_DB_HOST" "$MAUTIC_DB_USER" "$MAUTIC_DB_PASSWORD" "$MAUT
 
 echo >&2 "========================================================================"
 echo >&2 "This server is now configured to run Mautic!"
-echo >&2 "The following information will be prefilled into the installer (keep password field empty):"
-echo >&2 "Host Name: $MAUTIC_DB_HOST"
-echo >&2 "Database Name: $MAUTIC_DB_NAME"
-echo >&2 "Database Username: $MAUTIC_DB_USER"
-echo >&2 "Database Password: $MAUTIC_DB_PASSWORD"
 echo >&2 "========================================================================"
 echo >&2
 echo >&2
